@@ -1,0 +1,49 @@
+syntax = "proto3";
+package api;
+
+// messages for GreatCommonDivisor
+message GCDRequest {
+	int32 first = 1;
+	int32 second = 2;
+}
+
+message GCDResponse {
+	int32 result = 1;
+}
+
+// messages for fibonacci
+message FibonacciRequest {
+	int32 count = 1;
+}
+
+message FibonacciResponse {
+	int32 result = 1;
+}
+
+// messages for statistics
+message StatisticsRequest {
+	int32 number = 1;
+}
+
+message StatisticsResponse {
+	int32 count = 1;
+	int32 maximum = 2;
+	int32 minimum = 3;
+	float average = 4;
+}
+
+// messages for prime factorization
+message PrimeFactorizationRequest {
+	int32 number = 1;
+}
+
+message PrimeFactorizationResponse {
+	string result = 1;
+}
+
+service SimpleMath {
+	rpc GreatCommonDivisor (GCDRequest) returns (GCDResponse) {}
+	rpc GetFibonacci (FibonacciRequest) returns (stream FibonacciResponse) {}
+	rpc Statistics (stream StatisticsRequest) returns (StatisticsResponse) {}
+	rpc PrimeFactorization (stream PrimeFactorizationRequest) returns (stream PrimeFactorizationResponse) {}
+}

@@ -16,9 +16,33 @@ const (
 	address = "localhost:50051"
 )
 
+// AuthItem holds the username/password
+type AuthItem struct {
+	Username string
+	Password string
+}
+
+// GetRequestMetadata gets the current request metadata
+func (a *AuthItem) GetRequestMetadata(context.Context, ...string) (map[string]string, error) {
+	return map[string]string{
+		"username": a.Username,
+		"password": a.Password,
+	}, nil
+}
+
+// RequireTransportSecurity indicates whether the credentials requires transport security
+func (a *AuthItem) RequireTransportSecurity() bool {
+	return true
+}
+
 func getGRPCConn() (conn *grpc.ClientConn, err error) {
+	// Setup the username/password
+	auth := AuthItem{
+		Username: "valineliu",
+		Password: "badroot",
+	}
 	creds, err := credentials.NewClientTLSFromFile("../cert/server.crt", "")
-	return grpc.Dial(address, grpc.WithTransportCredentials(creds))
+	return grpc.Dial(address, grpc.WithTransportCredentials(creds), grpc.WithPerRPCCredentials(&auth))
 }
 
 func GreatCommonDivisor(first, second string) {
@@ -145,7 +169,7 @@ func PrimeFactorization(count string) {
 		if err := stream.Send(&pb.PrimeFactorizationRequest{Number: int32(n)}); err != nil {
 			log.Fatalf("failed to send: %v", err)
 		}
-		log.Printf("send number: %d",n)
+		log.Printf("send number: %d", n)
 	}
 	stream.CloseSend()
 	<-waitc
